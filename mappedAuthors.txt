@@ -1,6 +1,7 @@
 ##
 ## List of Jasig committers that have setup GitHub accounts, maps the Jasig SVN username to the GitHub account name
 ##
+(no author) = infrastructure@lists.ja-sig.org <infrastructure@lists.ja-sig.org>
 alesueur = Arnaud Lesueur <arnaud.lesueur@gmail.com>
 arvidsg = Arvīds Grabovskis <arvids.grabovskis@gmail.com>
 awp9 = Andrew Petro <apetro@unicon.net>
@@ -13,6 +14,8 @@ hgilbert = Howard Gilbert <Howard.Gilbert@yale.edu>
 jmartin = John Martin <jmartin@unicon.net>
 serac = Marvin S. Addison <marvin.addison@gmail.com>
 steve.swinsburg = Steve Swinsburg <steve.swinsburg@gmail.com>
+susan.bramhall = Susan Bramhall <susan.bramhall@yale.edu>
+susan.bramhall@yale.edu = Susan Bramhall <susan.bramhall@yale.edu>
 tuyly = Tuyhang Ly <tuyly@rutgers.edu>
 velpi = Jan Van der Velpen <velpi@industria.be>
 wgthom = William G. Thompson, Jr. <wgthom@gmail.com>

@@ -4,7 +4,7 @@
 ## Populated by:
 ##   svn log --xml https://source.jasig.org  | grep -E "^<author>[^<]+</author>$" | sed "s/^<author>\(.*\)<\/author>$/\1/
 ##
-(no author) = infrastructure@lists.ja-sig.org
+(no author)
 achristoforides
 acolebourne
 adamfranco

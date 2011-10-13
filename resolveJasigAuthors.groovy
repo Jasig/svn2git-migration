@@ -5,12 +5,12 @@ import groovyx.net.http.*
 def allAuthors = new File("allAuthors.txt");
 def resolvedAuthors = new File("resolvedAuthors.txt");
 
-def authorsMap = new TreeMap(String.CASE_INSENSITIVE_ORDER);
-
 def http = new HTTPBuilder( 'https://login.jasig.org/rest/usermanagement/latest/user' )
 http.auth.basic 'svn2git', 'XXXXXXXX'
 http.handler.success = { "Success!" }
 http.handler.failure = { resp -> "Unexpected failure: ${resp.statusLine}" }
+
+def authorsMap = new TreeMap(String.CASE_INSENSITIVE_ORDER);
 
 def resolveAuthors(authorsFile, http, authorsMap) {
     def lineNum = 0;
@@ -41,7 +41,7 @@ def resolveAuthors(authorsFile, http, authorsMap) {
         }
         
         if (gitAuthor == null) {
-            gitAuthor = svnAuthor + "@committers.jasig.org";
+            gitAuthor = svnAuthor + "@committers.jasig.org <" svnAuthor + "@committers.jasig.org>";
         }
         
         println svnAuthor + " = " + gitAuthor;
