@@ -20,3 +20,4 @@ wgthom = William G. Thompson, Jr. <wgthom@gmail.com>
 holdorph = Cris J. Holdorph <holdorph@unicon.net> 
 awills = Andrew Wills <wills.drew@gmail.com>
 tim = Tim Carroll <tim@logiclander.com>
+nblair = Nicholas Blair <nicholas.blair@gmail.com>
