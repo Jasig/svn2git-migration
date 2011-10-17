@@ -1,61 +1,114 @@
 @Grab(group='org.codehaus.groovy.modules.http-builder', module='http-builder', version='0.5.1' )
 
 import groovyx.net.http.*
+import static Constants.*
 
-def allAuthors = new File("allAuthors.txt");
+class Constants {
+    static final def SVN_URL = "https://source.jasig.org";
+    static final def MISSING_INFO_EMAIL_SUFFIX = "@committers.jasig.org";
+    
+    static final def SVN_AUTHOR_PATTERN = ~/<author>(.*)<\/author>/
+    static final def SVN_REVISION_PATTERN = ~/\s+revision="(\d+)">/
+    static final def SVN_LAST_REV = ~/## r(\d+)/
+    static final def SVN_MISSING_INFO = ~("[^<]+" + MISSING_INFO_EMAIL_SUFFIX + " <[^>]+" + MISSING_INFO_EMAIL_SUFFIX + ">")
+}
+
 def resolvedAuthors = new File("resolvedAuthors.txt");
 
-def http = new HTTPBuilder( 'https://login.jasig.org/rest/usermanagement/latest/user' )
-http.auth.basic 'svn2git', 'XXXXXXXX'
+final def http = new HTTPBuilder( 'https://login.jasig.org/rest/usermanagement/latest/user' )
+http.auth.basic 'svn2git', 'XXXXXXX'
 http.handler.success = { "Success!" }
 http.handler.failure = { resp -> "Unexpected failure: ${resp.statusLine}" }
 
-def authorsMap = new TreeMap(String.CASE_INSENSITIVE_ORDER);
+final def authorsMap = new TreeMap(String.CASE_INSENSITIVE_ORDER);
 
-def resolveAuthors(authorsFile, http, authorsMap) {
+def resolveAuthor(http, svnAuthor) {
+    def gitAuthor;
+    http.get( query:[username:svnAuthor] ) { resp, xml ->
+        if (resp.status == 200) {
+            gitAuthor = xml['display-name'].text() + " <" + xml.email.text() + ">";
+            println "  Resolved: " +svnAuthor + " = " + gitAuthor;
+        }
+    }
+    
+    if (gitAuthor == null) {
+        gitAuthor = svnAuthor + MISSING_INFO_EMAIL_SUFFIX + " <" + svnAuthor + MISSING_INFO_EMAIL_SUFFIX + ">";
+        println "Unresolved: " + svnAuthor + " = " + gitAuthor;
+    }
+    
+    
+    return gitAuthor;
+}
+
+//Read the previous resolved author data
+def lastRev = 0;
+if (resolvedAuthors.exists()) {
     def lineNum = 0;
-    authorsFile.eachLine { line ->
+    resolvedAuthors.eachLine { line ->
         lineNum++;
         line = line.trim();
+        
+        if (lastRev == 0) {
+            def lastRevMatcher = SVN_LAST_REV.matcher(line);
+            if (lastRevMatcher.matches()) {
+                lastRev = lastRevMatcher[0][1];
+                return;
+            }
+        }
+        
         if (line.length() == 0 || line.startsWith("#")) {
             return;
         }
         
         def lineParts = line.split("=");
-        
-        def svnAuthor = lineParts[0].trim();
-        def gitAuthor;
-        
-        if (lineParts.length == 1) {
-            http.get( query:[username:svnAuthor] ) { resp, xml ->
-                if (resp.status == 200) {
-                    gitAuthor = xml['display-name'].text() + " <" + xml.email.text() + ">";
-                }
-            }
+        if (lineParts.length != 2) {
+            throw new Exception(resolvedAuthors.toString() + " - Failed to parse line " + lineNum + ", it did not have two parts: " + line);
         }
-        else if (lineParts.length == 2) {
-            gitAuthor = lineParts[1].trim();
+        def svnAuthor = lineParts[0].trim();
+        def gitAuthor = lineParts[1].trim();
+        
+        
+        def missingInfoMatcher = SVN_MISSING_INFO.matcher(gitAuthor);
+        if (!missingInfoMatcher.matches()) {
+            println "   Copying: " + svnAuthor + " = " + gitAuthor;
+            authorsMap.put(svnAuthor, gitAuthor);
         }
         else {
-            throw new Exception(authorsFile + " - Failed to parse line " + lineNum + ", it did not have one or two parts: " + line, e);
+            gitAuthor = resolveAuthor(http, svnAuthor);
+            authorsMap.put(svnAuthor, gitAuthor);
         }
-        
-        if (gitAuthor == null) {
-            gitAuthor = svnAuthor + "@committers.jasig.org <" svnAuthor + "@committers.jasig.org>";
-        }
-        
-        println svnAuthor + " = " + gitAuthor;
-        authorsMap.put(svnAuthor, gitAuthor);
     }
 }
 
-//Resolve svn usernames to "Full Name <email@address.com>
-resolveAuthors(allAuthors, http, authorsMap);
+//Run SVN log command and resolve author data
+def svnLogCmd = "svn log --xml -r " + lastRev + ":HEAD " + SVN_URL;
+println "Finding new authors: " + svnLogCmd;
+def svnLog = svnLogCmd.execute();
+svnLog.in.eachLine { line ->
+    def authorMatcher = SVN_AUTHOR_PATTERN.matcher(line);
+    if (authorMatcher.matches()) {
+        def svnAuthor = authorMatcher[0][1];
+        if (!authorsMap.containsKey(svnAuthor)) {
+            println "New SVN Author: " + svnAuthor;
+            def gitAuthor = resolveAuthor(http, svnAuthor);
+            authorsMap.put(svnAuthor, gitAuthor);
+        }
+        return;
+    }
+    
+    def revisionMatcher = SVN_REVISION_PATTERN.matcher(line);
+    if (revisionMatcher.matches()) {
+        lastRev = revisionMatcher[0][1];
+        return;
+    }
+}
+
 
 //Write out resolved authors file
 resolvedAuthors.withWriter { writer ->
     writer.writeLine("##");
     writer.writeLine("## GENERATED BY resolveJasigAuthors.groovy DO NOT MODIFY BY HAND");
+    writer.writeLine("## r" + lastRev);
     writer.writeLine("##");
     
     authorsMap.each() {svnAuth, gitAuth ->
