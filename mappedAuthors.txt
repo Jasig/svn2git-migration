@@ -3,7 +3,9 @@
 ##
 (no author) = infrastructure@lists.ja-sig.org <infrastructure@lists.ja-sig.org>
 alesueur = Arnaud Lesueur <arnaud.lesueur@gmail.com>
+agherna = Andy Gherna <argherna@gmail.com>
 arvidsg = Arvīds Grabovskis <arvids.grabovskis@gmail.com>
+awills = Andrew Wills <wills.drew@gmail.com>
 awp9 = Andrew Petro <apetro@unicon.net>
 battags = Scott Battaglia <scott.battaglia@gmail.com>
 bourey = Jen Bourey <jennifer.bourey@gmail.com>
@@ -11,13 +13,12 @@ dkopylen = Dmitriy Kopylenko <dkopylenko@unicon.net>
 dmazurek = Drew Mazurek <dmazurek@unicon.net>
 edalquist = Eric Dalquist <eric.dalquist@gmail.com>
 hgilbert = Howard Gilbert <Howard.Gilbert@yale.edu>
+holdorph = Cris J. Holdorph <holdorph@unicon.net> 
 jmartin = John Martin <jmartin@unicon.net>
+nblair = Nicholas Blair <nicholas.blair@gmail.com>
 serac = Marvin S. Addison <marvin.addison@gmail.com>
 steve.swinsburg = Steve Swinsburg <steve.swinsburg@gmail.com>
+tim = Tim Carroll <tim@logiclander.com>
 tuyly = Tuyhang Ly <tuyly@rutgers.edu>
 velpi = Jan Van der Velpen <velpi@industria.be>
 wgthom = William G. Thompson, Jr. <wgthom@gmail.com>
-holdorph = Cris J. Holdorph <holdorph@unicon.net> 
-awills = Andrew Wills <wills.drew@gmail.com>
-tim = Tim Carroll <tim@logiclander.com>
-nblair = Nicholas Blair <nicholas.blair@gmail.com>
